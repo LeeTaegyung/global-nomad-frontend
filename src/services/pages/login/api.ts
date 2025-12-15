@@ -1,4 +1,3 @@
-import { apiClient } from '@/src/services/primitives/apiClient';
 import { TokenUserResponseType } from '@/src/types/userType';
 import axios from 'axios';
 
@@ -24,6 +23,6 @@ export async function loginUser(
 export async function kakaoLoginUser(
   loginBody: KakaoLoginRequestBody
 ): Promise<TokenUserResponseType> {
-  const res = await apiClient.post('/oauth/sign-in/kakao', loginBody);
+  const res = await axios.post('/api/auth/kakao', loginBody);
   return res.data;
 }
