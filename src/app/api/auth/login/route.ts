@@ -1,9 +1,7 @@
+import { setTokenCookies } from '@/src/app/api/_lib/tokenUtils';
 import { loginRequestBody } from '@/src/services/pages/login/api';
 import { TokenUserResponseType } from '@/src/types/userType';
-import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
-
-const isProduction = process.env.NODE_ENV === 'production';
 
 export async function POST(req: NextRequest) {
   const body: loginRequestBody = await req.json();
@@ -18,23 +16,8 @@ export async function POST(req: NextRequest) {
   if (!res.ok) return NextResponse.json(data, { status: res.status });
 
   const { accessToken, refreshToken } = data;
-  const cookieStore = await cookies();
 
-  // 액세스 토큰 저장
-  cookieStore.set('accessToken', accessToken, {
-    httpOnly: true,
-    sameSite: isProduction ? 'none' : 'lax',
-    secure: isProduction,
-    maxAge: 60 * 30, // 30분
-  });
-
-  // 리프레시 토큰 저장
-  cookieStore.set('refreshToken', refreshToken, {
-    httpOnly: true,
-    sameSite: isProduction ? 'none' : 'lax',
-    secure: isProduction,
-    maxAge: 60 * 60 * 24 * 14, // 14일
-  });
+  await setTokenCookies(accessToken, refreshToken);
 
   return NextResponse.json(data);
 }

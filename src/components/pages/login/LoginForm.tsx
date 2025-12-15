@@ -51,9 +51,8 @@ export default function LoginForm() {
     formState: { errors, isSubmitting, isValid },
   } = useForm<FormDataType>({ mode: 'onChange' });
 
-  const handleSubmitForm = (formData: FormDataType) => {
-    loginMutation.mutate(formData);
-  };
+  const handleSubmitForm = (formData: FormDataType) =>
+    loginMutation.mutateAsync(formData);
 
   return (
     <>
@@ -98,7 +97,7 @@ export default function LoginForm() {
           className='mt-2 md:mt-[10px]'
           disabled={!isValid || isSubmitting}
         >
-          로그인하기
+          {isSubmitting ? '로그인중...' : '로그인하기'}
         </Button>
       </form>
       <AlertModal
