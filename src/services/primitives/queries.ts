@@ -23,11 +23,10 @@ const queryClient = getQueryClient();
 
 export const queries = {
   user: () => ['user'],
-  userOptions: (accessToken: string | null | undefined) =>
+  userOptions: () =>
     queryOptions({
       queryKey: [...queries.user()],
       queryFn: () => getUserInfo(),
-      enabled: !!accessToken,
     }),
   myReservationList: () => ['myReservationList'],
   myReservationLists: (status: ReservationStatus | null) => [

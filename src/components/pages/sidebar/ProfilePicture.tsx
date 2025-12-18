@@ -1,7 +1,6 @@
 'use client';
 
 import { queries } from '@/src/services/primitives/queries';
-import { useTokenStore } from '@/src/store/useTokenStore';
 import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
 import EditIcon from '@/public/images/icons/EditIcon.svg';
@@ -10,8 +9,7 @@ import { patchMyInfo, postAvatar } from '@/src/services/pages/users/api';
 import { getQueryClient } from '@/src/utils/getQueryClient';
 
 export default function ProfilePicture() {
-  const { accessToken } = useTokenStore();
-  const { data: userData } = useQuery(queries.userOptions(accessToken));
+  const { data: userData } = useQuery(queries.userOptions());
   const queryClient = getQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
 

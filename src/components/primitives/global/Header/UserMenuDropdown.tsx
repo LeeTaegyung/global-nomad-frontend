@@ -1,6 +1,6 @@
 'use client';
 
-import logout from '@/src/services/primitives/logout';
+import useLogout from '@/src/hooks/useLogout';
 import { useRouter } from 'next/navigation';
 
 export default function UserMenuDropdown({
@@ -9,6 +9,7 @@ export default function UserMenuDropdown({
   setVisible: (state: boolean) => void;
 }) {
   const router = useRouter();
+  const logout = useLogout();
 
   const handleMypageClick = () => {
     setVisible(false);
