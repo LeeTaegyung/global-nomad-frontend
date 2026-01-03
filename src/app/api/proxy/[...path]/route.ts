@@ -23,11 +23,23 @@ const handleApiResponse = async (res: Response) => {
     // json 처리
     const resData = await res.json();
     return NextResponse.json(resData, { status: res.status });
-  } else {
-    // 바이너리/파일 처리
-    const buffer = await res.arrayBuffer();
-    return new NextResponse(buffer, { status: res.status });
   }
+
+  if (contentType.startsWith('text/')) {
+    // text 처리
+    const resText = await res.text();
+    return NextResponse.json(resText, {
+      status: res.status,
+      headers: { 'Content-Type': contentType },
+    });
+  }
+
+  // 바이너리/파일 처리
+  const buffer = await res.arrayBuffer();
+  return new NextResponse(buffer, {
+    status: res.status,
+    headers: { 'Content-Type': contentType },
+  });
 };
 
 const fetchWithAccessToken = async (req: NextRequest) => {
