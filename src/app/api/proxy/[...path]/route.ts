@@ -1,3 +1,5 @@
+import { fetchWithAccessToken } from '@/src/app/api/_lib/proxyRequest';
+import { handleApiResponse } from '@/src/app/api/_lib/proxyResponse';
 import { setTokenCookies } from '@/src/app/api/_lib/tokenUtils';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
@@ -6,67 +8,6 @@ interface TokenReissueResponse {
   accessToken: string;
   refreshToken: string;
 }
-
-interface CustomRequestInit extends RequestInit {
-  duplex?: 'half' | 'full' | string;
-}
-
-const handleApiResponse = async (res: Response) => {
-  // 204 코드시 처리
-  if (res.status === 204) {
-    return new NextResponse(null, { status: 204 });
-  }
-
-  const contentType = res.headers.get('content-type') || '';
-
-  if (contentType.includes('application/json')) {
-    // json 처리
-    const resData = await res.json();
-    return NextResponse.json(resData, { status: res.status });
-  }
-
-  if (contentType.startsWith('text/')) {
-    // text 처리
-    const resText = await res.text();
-    return NextResponse.json(resText, {
-      status: res.status,
-      headers: { 'Content-Type': contentType },
-    });
-  }
-
-  // 바이너리/파일 처리
-  const buffer = await res.arrayBuffer();
-  return new NextResponse(buffer, {
-    status: res.status,
-    headers: { 'Content-Type': contentType },
-  });
-};
-
-const fetchWithAccessToken = async (req: NextRequest) => {
-  const cookieStore = await cookies();
-  const headers = new Headers(req.headers);
-  const accessToken = cookieStore.get('accessToken')?.value;
-  const { pathname, search } = req.nextUrl;
-  const targetPath = pathname.replace('/api/proxy', '') + search;
-
-  // 액세스 토큰 주입
-  if (accessToken) {
-    headers.set('Authorization', `Bearer ${accessToken}`);
-  }
-
-  const fetchOptions: CustomRequestInit = {
-    method: req.method,
-    headers,
-    body: req.body,
-    duplex: 'half',
-  };
-
-  // request 요청
-  return await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}${targetPath}`,
-    fetchOptions
-  );
-};
 
 const PUBLIC_PATH_PATTERNS = [
   /^\/$/,
