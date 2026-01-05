@@ -9,15 +9,6 @@ interface TokenReissueResponse {
   refreshToken: string;
 }
 
-const PUBLIC_PATH_PATTERNS = [
-  /^\/$/,
-  /^\/detail\/\d+$/,
-  /^\/login$/,
-  /^\/login\/social\/kakao$/,
-  /^\/signup$/,
-  /^\/signup\/social\/kakao$/,
-];
-
 const handleProxyRequest = async (
   req: NextRequest,
   params: { path: string[] }
@@ -39,31 +30,26 @@ const handleProxyRequest = async (
         headers: refreshHeaders,
       }
     );
-    const data: TokenReissueResponse = await refreshTokenRes.json();
 
     // 갱신 실패시
     if (!refreshTokenRes.ok) {
       // 로그인 페이지로 리다이렉트
-      const response = new NextResponse(null);
+      const response = NextResponse.json(
+        { error: 'TOKEN_REFRESH_FAILED' },
+        { status: 401 }
+      );
+
+      // 커스텀 헤더 추가
+      response.headers.set('X-Auth-Error', 'REFRESH_TOKEN_EXPIRED');
 
       // 쿠키 삭제
       response.cookies.delete('accessToken');
       response.cookies.delete('refreshToken');
 
-      const currentPath = req.nextUrl.pathname;
-      const isPublicPath = PUBLIC_PATH_PATTERNS.some((regex) =>
-        regex.test(currentPath)
-      );
-
-      if (!isPublicPath) {
-        // 인증 필요 -> 로그인 페이지로 redirect
-        return NextResponse.redirect(`/login?redirect_path=${currentPath}`);
-      }
-
-      // 인증 필요 없는 Public Path -> 그냥 상태만 초기화
       return response;
     }
 
+    const data: TokenReissueResponse = await refreshTokenRes.json();
     const { accessToken: newAccessToken, refreshToken: newRefreshToken } = data;
 
     // 새롭게 발급 받은 토큰 재설정
