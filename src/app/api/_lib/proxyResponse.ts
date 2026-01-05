@@ -17,7 +17,7 @@ export const handleApiResponse = async (res: Response) => {
   if (contentType.startsWith('text/')) {
     // text 처리
     const resText = await res.text();
-    return NextResponse.json(resText, {
+    return new NextResponse(resText, {
       status: res.status,
       headers: { 'Content-Type': contentType },
     });
