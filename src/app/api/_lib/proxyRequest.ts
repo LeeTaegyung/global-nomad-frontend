@@ -25,7 +25,7 @@ export const fetchWithAccessToken = async (
   const fetchOptions: CustomRequestInit = {
     method: req.method,
     headers,
-    body: req.body,
+    body: req.body ? req.clone().body : null,
     duplex: 'half',
   };
 
