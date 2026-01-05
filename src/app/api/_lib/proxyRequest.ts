@@ -5,12 +5,17 @@ interface CustomRequestInit extends RequestInit {
   duplex?: 'half' | 'full' | string;
 }
 
-export const fetchWithAccessToken = async (req: NextRequest) => {
+export const fetchWithAccessToken = async (
+  req: NextRequest,
+  params: { path: string[] }
+) => {
   const cookieStore = await cookies();
   const headers = new Headers(req.headers);
   const accessToken = cookieStore.get('accessToken')?.value;
-  const { pathname, search } = req.nextUrl;
-  const targetPath = pathname.replace('/api/proxy', '') + search;
+
+  const pathname = `/${params.path.join('/')}`;
+  const search = req.nextUrl.search;
+  const targetPath = pathname + search;
 
   // 액세스 토큰 주입
   if (accessToken) {

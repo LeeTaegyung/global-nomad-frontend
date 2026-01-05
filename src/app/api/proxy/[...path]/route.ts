@@ -18,11 +18,14 @@ const PUBLIC_PATH_PATTERNS = [
   /^\/signup\/social\/kakao$/,
 ];
 
-const handleProxyRequest = async (req: NextRequest): Promise<NextResponse> => {
+const handleProxyRequest = async (
+  req: NextRequest,
+  params: { path: string[] }
+): Promise<NextResponse> => {
   const cookieStore = await cookies();
   const refreshToken = cookieStore.get('refreshToken')?.value;
 
-  const res = await fetchWithAccessToken(req);
+  const res = await fetchWithAccessToken(req, params);
 
   // 액세스 토큰 만료 + 리프레시 토큰이 있다면,
   if (res.status === 401 && refreshToken) {
@@ -67,7 +70,7 @@ const handleProxyRequest = async (req: NextRequest): Promise<NextResponse> => {
     await setTokenCookies(newAccessToken, newRefreshToken);
 
     // 다시 api 요청
-    const retryRes = await fetchWithAccessToken(req);
+    const retryRes = await fetchWithAccessToken(req, params);
 
     return handleApiResponse(retryRes);
   }
@@ -75,15 +78,31 @@ const handleProxyRequest = async (req: NextRequest): Promise<NextResponse> => {
   return handleApiResponse(res);
 };
 
-export async function GET(req: NextRequest) {
-  return handleProxyRequest(req);
+export async function GET(
+  req: NextRequest,
+  ctx: { params: { path: string[] } }
+) {
+  const params = await ctx.params;
+  return handleProxyRequest(req, params);
 }
-export async function POST(req: NextRequest) {
-  return handleProxyRequest(req);
+export async function POST(
+  req: NextRequest,
+  ctx: { params: { path: string[] } }
+) {
+  const params = await ctx.params;
+  return handleProxyRequest(req, params);
 }
-export async function PATCH(req: NextRequest) {
-  return handleProxyRequest(req);
+export async function PATCH(
+  req: NextRequest,
+  ctx: { params: { path: string[] } }
+) {
+  const params = await ctx.params;
+  return handleProxyRequest(req, params);
 }
-export async function DELETE(req: NextRequest) {
-  return handleProxyRequest(req);
+export async function DELETE(
+  req: NextRequest,
+  ctx: { params: { path: string[] } }
+) {
+  const params = await ctx.params;
+  return handleProxyRequest(req, params);
 }
