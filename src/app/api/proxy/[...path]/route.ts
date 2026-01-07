@@ -33,7 +33,6 @@ const handleProxyRequest = async (
 
     // 갱신 실패시
     if (!refreshTokenRes.ok) {
-      // 로그인 페이지로 리다이렉트
       const response = NextResponse.json(
         { error: 'TOKEN_REFRESH_FAILED' },
         { status: 401 }
